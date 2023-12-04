@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
-  name: node-exporter-daemonset
+  name: node-exporter
 spec:
   selector:
     matchLabels:
@@ -11,7 +11,20 @@ spec:
       labels:
         app: node-exporter
     spec:
-      hostNetwork: true
       containers:
-        - name: node-exporter
-          image: vladhl/node-exporter-k8s:latest
+      - name: node-exporter
+        image: prom/node-exporter:latest
+        ports:
+        - containerPort: 9100
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: node-exporter-svc
+spec:
+  selector:
+    app: node-exporter
+  ports:
+    - protocol: TCP
+      port: 9100
+      targetPort: 9100
