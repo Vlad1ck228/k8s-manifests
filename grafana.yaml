@@ -1,42 +1,35 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: prometheus-deployment
+  name: grafana-deployment
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: prometheus
+      app: grafana
   template:
     metadata:
       labels:
-        app: prometheus
+        app: grafana
     spec:
       containers:
-      - name: prometheus
-        image: prom/prometheus:latest
-        args:
-        - "--config.file=/etc/prometheus/prometheus.yml"
+      - name: grafana
+        image: grafana/grafana:latest
         ports:
-        - containerPort: 9090
-        volumeMounts:
-        - name: config-volume
-          mountPath: /etc/prometheus
-      volumes:
-      - name: config-volume
-        configMap:
-          name: prometheus-config
-
+        - containerPort: 3000
+        env:
+        - name: GF_SECURITY_ADMIN_PASSWORD
+          value: admin 
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: prometheus-service
+  name: grafana-service
 spec:
   selector:
-    app: prometheus
+    app: grafana
   ports:
     - protocol: TCP
       port: 80
-      targetPort: 9090
+      targetPort: 3000
   type: LoadBalancer
